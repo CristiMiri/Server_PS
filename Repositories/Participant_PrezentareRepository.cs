@@ -1,11 +1,6 @@
 ﻿
 using Server.Domain.DTO;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server.Repositories
 {
@@ -77,8 +72,9 @@ namespace Server.Repositories
             return repository.ExecuteNonQuery(nonQuery);
         }
 
-        public bool CreateParticipantPresentation(int idParticipant, object idPresentation)
+        public bool CreateParticipantPresentation(int idParticipant, int idPresentation)
         {
+            
             string nonQuery = $"INSERT INTO presentation_Participant (id_participant, id_presentation) VALUES ({idParticipant}, {idPresentation})";
             return repository.ExecuteNonQuery(nonQuery);
         }

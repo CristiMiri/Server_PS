@@ -7,8 +7,8 @@ namespace Server;
 class Program
 {
     static async Task Main(string[] args)
-    {       
-        ServerHost serviceHost = new ServerHost();
+    {
+        ServerHost serviceHost = ServerHost.Instance;
         UserRepository userRepository = new UserRepository();
         if (userRepository.ReadUsers().Count() > 0)
         {

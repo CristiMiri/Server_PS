@@ -1,10 +1,5 @@
 ﻿
 using Server.Domain.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server.Domain.DTO
 {
@@ -16,7 +11,7 @@ namespace Server.Domain.DTO
         public string Phone { get; set; }
         public string CNP { get; set; }
         public string PdfFilePath { get; set; }
-        public string PhotoFilePath { get; set; }
+        public string PhotoFilePath { get; set; }        
 
         // Default constructor
         public ParticipantDTO() { }

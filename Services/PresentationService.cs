@@ -2,11 +2,6 @@
 using Server.Domain.Model;
 using Server.Repositories;
 using Server.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server.Services
 {

@@ -1,11 +1,6 @@
 ﻿using Server.Domain.DTO;
 using Server.Domain.Model;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server.Repositories
 {
@@ -31,7 +26,9 @@ namespace Server.Repositories
                 Hour = TimeSpan.Parse(row["hour"].ToString()),
                 Section = (Section)Enum.Parse(typeof(Section), row["section"].ToString()),
                 IdConference = Convert.ToInt32(row["id_conference"]),
-                IdAuthor = Convert.ToInt32(row["id_author"])
+                IdAuthor = Convert.ToInt32(row["id_author"]),
+                Author = new List<ParticipantDTO>(),
+                Participants = new List<ParticipantDTO>()
             };
         }
 
@@ -131,8 +128,7 @@ namespace Server.Repositories
                 presentations.Add(RowToPresentation(row));
             }
             return presentations;
-        }
-
+        }        
 
     }
 }

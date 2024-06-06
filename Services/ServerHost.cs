@@ -59,7 +59,7 @@ namespace Server.Services
             while ((byteCount = await stream.ReadAsync(buffer, 0, buffer.Length)) != 0)
             {
                 string request = Encoding.UTF8.GetString(buffer, 0, byteCount);
-                Console.WriteLine($"Received: {request}");                                
+                Console.WriteLine($"Received: {request}");
 
 
                 PackageDTO response = await ProcessRequestAsync(request);
@@ -99,14 +99,22 @@ namespace Server.Services
                     case "StatisticsService":
                         return await HandleStatisticsServiceRequestAsync(method, parameters);
                     default:
-                        return new PackageDTO { Result = false, Message = "Service not found" };
+                        return new PackageDTO.Builder()
+                            .SetResult(false)
+                            .SetMessage("Service not found")
+                            .SetData(new { })
+                            .Build();
                 }
             }
             catch (Exception ex)
             {
-                return new PackageDTO { Result = false, Message = $"Error processing request: {ex.Message}" };
+                return new PackageDTO.Builder()
+                    .SetResult(false)
+                    .SetMessage(ex.ToString())
+                    .Build();
             }
         }
+
 
         private async Task<PackageDTO> HandleUserServiceRequestAsync(string method, object parameters)
         {
@@ -117,29 +125,48 @@ namespace Server.Services
                     case "CreateUser":
                         var userDTO = JsonConvert.DeserializeObject<UserDTO>(parameters.ToString());
                         bool created = _userService.CreateUser(userDTO);
-                        return new PackageDTO { Result = created, Message = created ? "User created successfully" : "Failed to create user", Data = new UserDTO() };
+                        return new PackageDTO.Builder()
+                            .SetResult(created)
+                            .SetMessage(created ? "User created successfully" : "Failed to create user")
+                            .SetData(new UserDTO.Builder().Build())
+                            .Build();
 
                     case "DeleteUser":
                         userDTO = JsonConvert.DeserializeObject<UserDTO>(parameters.ToString());
                         bool deleted = _userService.DeleteUser(userDTO);
-                        return new PackageDTO { Result = deleted, Message = deleted ? "User deleted successfully" : "Failed to delete user", Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(deleted)
+                            .SetMessage(deleted ? "User deleted successfully" : "Failed to delete user")
+                            .Build();
 
                     case "GetAllUsers":
                         var users = _userService.GetAllUsers();
                         string allUsersMessage = users != null ? "Users retrieved successfully" : "Failed to retrieve users";
-                        return new PackageDTO { Result = users != null, Message = allUsersMessage, Data = users };
+                        return new PackageDTO.Builder()
+                            .SetResult(users != null)
+                            .SetMessage(allUsersMessage)
+                            .SetData(users)
+                            .Build();
 
                     case "GetUserbyId":
                         int id = int.Parse(parameters.ToString());
                         var user = _userService.GetUserbyId(id);
                         string userByIdMessage = user != null ? "User retrieved successfully" : "Failed to retrieve user";
-                        return new PackageDTO { Result = user != null, Message = userByIdMessage, Data = user };
+                        return new PackageDTO.Builder()
+                            .SetResult(user != null)
+                            .SetMessage(userByIdMessage)
+                            .SetData(user)
+                            .Build();
 
                     case "GetUsersByEmailAndPassword":
                         var creds = JsonConvert.DeserializeObject<Dictionary<string, string>>(parameters.ToString());
                         user = _userService.GetUsersByEmailAndPassword(creds["email"], creds["password"]);
                         string usersByEmailAndPasswordMessage = user != null ? "User retrieved successfully" : "Failed to retrieve user";
-                        return new PackageDTO { Result = user != null, Message = usersByEmailAndPasswordMessage, Data = user };
+                        return new PackageDTO.Builder()
+                            .SetResult(user != null)
+                            .SetMessage(usersByEmailAndPasswordMessage)
+                            .SetData(user)
+                            .Build();
 
                     case "GetUsersByUserType":
                         JObject jsonObject = JObject.Parse(parameters.ToString());
@@ -148,29 +175,49 @@ namespace Server.Services
                         UserType userType = (UserType)Enum.ToObject(typeof(UserType), userTypeValue); // Convert int to enum
                         users = _userService.GetUsersByUserType(userType);
                         string usersByUserTypeMessage = users != null ? "Users retrieved successfully" : "Failed to retrieve users";
-                        return new PackageDTO { Result = users != null, Message = usersByUserTypeMessage, Data = users };
+                        return new PackageDTO.Builder()
+                            .SetResult(users != null)
+                            .SetMessage(usersByUserTypeMessage)
+                            .SetData(users)
+                            .Build();
 
                     case "UpdateUser":
                         userDTO = JsonConvert.DeserializeObject<UserDTO>(parameters.ToString());
                         bool updated = _userService.UpdateUser(userDTO);
-                        return new PackageDTO { Result = updated, Message = updated ? "User updated successfully" : "Failed to update user", Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(updated)
+                            .SetMessage(updated ? "User updated successfully" : "Failed to update user")
+                            .Build();
                     case "NotifyWhatsAppUpdate":
                         userDTO = JsonConvert.DeserializeObject<UserDTO>(parameters.ToString());
-                        bool updateResult = _userService.NotifyWhatsAppUpdate(userDTO);
-                        return new PackageDTO { Result = true, Message = updateResult ? "User updated successfully" : "Failed to update user", Data = new { } };
+                        bool updateResult = await _userService.NotifyWhatsAppUpdate(userDTO);
+                        return new PackageDTO.Builder()
+                            .SetResult(true)
+                            .SetMessage(updateResult ? "User updated successfully" : "Failed to update user")
+                            .Build();
                     case "NotifyEmailUpdate":
                         userDTO = JsonConvert.DeserializeObject<UserDTO>(parameters.ToString());
                         bool updateResult2 = _userService.NotifyEmailUpdate(userDTO);
-                        return new PackageDTO { Result = true, Message = updateResult2 ? "User updated successfully" : "Failed to update user", Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(true)
+                            .SetMessage(updateResult2 ? "User updated successfully" : "Failed to update user")
+                            .Build();
                     default:
-                        return new PackageDTO { Result = false, Message = "Method not found" , Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(false)
+                            .SetMessage("Method not found")
+                            .Build();
                 }
             }
             catch (Exception ex)
             {
-                return new PackageDTO { Result = false, Message = $"Error processing request: {ex.Message}" };
+                return new PackageDTO.Builder()
+                    .SetResult(false)
+                    .SetMessage($"Error processing request: {ex.Message}")
+                    .Build();
             }
         }
+
         private async Task<PackageDTO> HandlePresentationServiceRequestAsync(string method, object parameters)
         {
             try
@@ -180,35 +227,48 @@ namespace Server.Services
                     case "CreatePresentation":
                         var presentationDTO = JsonConvert.DeserializeObject<PresentationDTO>(parameters.ToString());
                         bool created = _presentationService.CreatePresentation(presentationDTO);
-                        return new PackageDTO { Result = created, Message = created ? "Presentation created successfully" : "Failed to create presentation" , Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(created)
+                            .SetMessage(created ? "Presentation created successfully" : "Failed to create presentation")
+                            .Build();
                     case "UpdatePresentation":
                         presentationDTO = JsonConvert.DeserializeObject<PresentationDTO>(parameters.ToString());
                         bool updated = _presentationService.UpdatePresentation(presentationDTO);
-                        return new PackageDTO { Result = updated, Message = updated ? "Presentation updated successfully" : "Failed to update presentation" , Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(updated)
+                            .SetMessage(updated ? "Presentation updated successfully" : "Failed to update presentation")
+                            .Build();
                     case "DeletePresentation":
                         PresentationDTO presentation = JsonConvert.DeserializeObject<PresentationDTO>(parameters.ToString());
                         bool deleted = _presentationService.DeletePresentation(presentation.Id);
-                        return new PackageDTO { Result = deleted, Message = deleted ? "Presentation deleted successfully" : "Failed to delete presentation" ,Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(deleted)
+                            .SetMessage(deleted ? "Presentation deleted successfully" : "Failed to delete presentation")
+                            .Build();
                     case "GetPresentation":
                         int id = int.Parse(parameters.ToString());
                         presentation = _presentationService.GetPresentation(id);
                         string presentationMessage = presentation != null ? "Presentation retrieved successfully" : "Failed to retrieve presentation";
-                        return new PackageDTO { Result = presentation != null, Message = presentationMessage, Data = presentation };
+                        return new PackageDTO.Builder()
+                            .SetResult(presentation != null)
+                            .SetMessage(presentationMessage)
+                            .SetData(presentation)
+                            .Build();
                     case "GetAllPresentation":
                         var presentations = _presentationService.GetAllPresentation();
                         foreach (PresentationDTO p in presentations)
                         {
                             ParticipantDTO author = _participantService.GetParticipant(p.IdAuthor);
                             p.Author.Add(author);
-                            p.Participants = _participant_PrezentareRepository.ReadParticipantsByPresentation(p);
+                            p.Participants.AddRange(_participant_PrezentareRepository.ReadParticipantsByPresentation(p));                            
                         }
                         string allPresentationMessage = presentations != null ? "Presentations retrieved successfully" : "Failed to retrieve presentations";
-                        return new PackageDTO { Result = presentations != null, Message = allPresentationMessage, Data = presentations };
+                        return new PackageDTO.Builder()
+                            .SetResult(presentations != null)
+                            .SetMessage(allPresentationMessage)
+                            .SetData(presentations)
+                            .Build();
                     case "GetPresentationsbySection":
-                        /*JObject jsonObject = JObject.Parse(parameters.ToString());
-                        // Access the value of the "userType" property
-                        int userTypeValue = (int)jsonObject["userType"];
-                        UserType userType = (UserType)Enum.ToObject(typeof(UserType), userTypeValue); // Convert int to enum*/
                         JObject jsonObject = JObject.Parse(parameters.ToString());
                         int sectionValue = (int)jsonObject["section"];
                         Section section = (Section)Enum.ToObject(typeof(Section), sectionValue); // Convert int to enum                        
@@ -216,21 +276,32 @@ namespace Server.Services
                         foreach (PresentationDTO p in presentations)
                         {
                             ParticipantDTO author = _participantService.GetParticipant(p.IdAuthor);
-                            p.Author.Add(author);
-                            p.Participants = _participant_PrezentareRepository.ReadParticipantsByPresentation(p);
+                            p.Author.Add(author);                           
+                            p.Participants.AddRange(_participant_PrezentareRepository.ReadParticipantsByPresentation(p));
                         }
                         string presentationsBySectionMessage = presentations != null ? "Presentations retrieved successfully" : "Failed to retrieve presentations";
-                        return new PackageDTO { Result = presentations != null, Message = presentationsBySectionMessage, Data = presentations };
+                        return new PackageDTO.Builder()
+                            .SetResult(presentations != null)
+                            .SetMessage(presentationsBySectionMessage)
+                            .SetData(presentations)
+                            .Build();
 
                     default:
-                        return new PackageDTO { Result = false, Message = "Method not found" };
+                        return new PackageDTO.Builder()
+                            .SetResult(false)
+                            .SetMessage("Method not found")
+                            .Build();
                 }
             }
             catch (Exception ex)
             {
-                return new PackageDTO { Result = false, Message = $"Error processing request: {ex.Message}" };
+                return new PackageDTO.Builder()
+                    .SetResult(false)
+                    .SetMessage($"Error processing request: {ex.Message}")
+                    .Build();
             }
         }
+
         private async Task<PackageDTO> HandleParticipantServiceRequestAsync(string method, object parameters)
         {
             try
@@ -240,78 +311,139 @@ namespace Server.Services
                     case "CreateParticipant":
                         var participantDTO = JsonConvert.DeserializeObject<ParticipantDTO>(parameters.ToString());
                         bool created = _participantService.CreateParticipant(participantDTO);
-                        return new PackageDTO { Result = created, Message = created ? "Participant created successfully" : "Failed to create participant" ,Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(created)
+                            .SetMessage(created ? "Participant created successfully" : "Failed to create participant")
+                            .Build();
                     case "UpdateParticipant":
                         participantDTO = JsonConvert.DeserializeObject<ParticipantDTO>(parameters.ToString());
                         bool updated = _participantService.UpdateParticipant(participantDTO);
-                        return new PackageDTO { Result = updated, Message = updated ? "Participant updated successfully" : "Failed to update participant", Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(updated)
+                            .SetMessage(updated ? "Participant updated successfully" : "Failed to update participant")
+                            .Build();
                     case "DeleteParticipant":
                         participantDTO = JsonConvert.DeserializeObject<ParticipantDTO>(parameters.ToString());
                         int id = participantDTO.Id;
                         bool deleted = _participantService.DeleteParticipant(id);
-                        return new PackageDTO { Result = deleted, Message = deleted ? "Participant deleted successfully" : "Failed to delete participant" , Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(deleted)
+                            .SetMessage(deleted ? "Participant deleted successfully" : "Failed to delete participant")
+                            .Build();
                     case "UpsertParticipant":
                         participantDTO = JsonConvert.DeserializeObject<ParticipantDTO>(parameters.ToString());
                         bool upserted = _participantService.UpsertParticipant(participantDTO);
-                        return new PackageDTO { Result = upserted, Message = upserted ? "Participant upserted successfully" : "Failed to upsert participant" , Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(upserted)
+                            .SetMessage(upserted ? "Participant upserted successfully" : "Failed to upsert participant")
+                            .Build();
                     case "GetParticipant":
                         id = int.Parse(parameters.ToString());
                         ParticipantDTO participant = _participantService.GetParticipant(id);
                         string participantMessage = participant != null ? "Participant retrieved successfully" : "Failed to retrieve participant";
-                        return new PackageDTO { Result = participant != null, Message = participantMessage, Data = participant };
+                        return new PackageDTO.Builder()
+                            .SetResult(participant != null)
+                            .SetMessage(participantMessage)
+                            .SetData(participant)
+                            .Build();
                     case "GetAll":
                         var participants = _participantService.GetAll();
-
                         string allParticipantsMessage = participants != null ? "Participants retrieved successfully" : "Failed to retrieve participants";
-                        return new PackageDTO { Result = participants != null, Message = allParticipantsMessage, Data = participants };
+                        return new PackageDTO.Builder()
+                            .SetResult(participants != null)
+                            .SetMessage(allParticipantsMessage)
+                            .SetData(participants)
+                            .Build();
                     case "GetParticipantsbySection":
                         var section = (Section)Enum.Parse(typeof(Section), parameters.ToString());
                         participants = _participantService.GetParticipantsbySection(section);
                         string participantsBySectionMessage = participants != null ? "Participants retrieved successfully" : "Failed to retrieve participants";
-                        return new PackageDTO { Result = participants != null, Message = participantsBySectionMessage, Data = participants };
+                        return new PackageDTO.Builder()
+                            .SetResult(participants != null)
+                            .SetMessage(participantsBySectionMessage)
+                            .SetData(participants)
+                            .Build();
                     case "GetLastParticipantId":
                         int lastId = _participantService.GetLastParticipantId();
-                        return new PackageDTO { Result = true, Message = "Last participant id retrieved successfully", Data = lastId };
+                        return new PackageDTO.Builder()
+                            .SetResult(true)
+                            .SetMessage("Last participant id retrieved successfully")
+                            .SetData(lastId)
+                            .Build();
                     case "AcceptParticipant":
                         participant = JsonConvert.DeserializeObject<ParticipantDTO>(parameters.ToString());
                         _participantService.AcceptParticipant(participant.Email);
-                        return new PackageDTO { Result = true, Message = "Participant accepted successfully" , Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(true)
+                            .SetMessage("Participant accepted successfully")
+                            .Build();
                     case "RejectParticipant":
                         participant = JsonConvert.DeserializeObject<ParticipantDTO>(parameters.ToString());
                         _participantService.RejectParticipant(participant.Email);
-                        return new PackageDTO { Result = true, Message = "Participant rejected successfully", Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(true)
+                            .SetMessage("Participant rejected successfully")
+                            .Build();
                     case "GetParticipantsPhotos":
                         var photos = _participantService.GetParticipantsPhotos();
                         string photosMessage = photos != null ? "Photos retrieved successfully" : "Failed to retrieve photos";
-                        return new PackageDTO { Result = photos != null, Message = photosMessage, Data = photos };
+                        return new PackageDTO.Builder()
+                            .SetResult(photos != null)
+                            .SetMessage(photosMessage)
+                            .SetData(photos)
+                            .Build();
                     case "GetParticipantCV":
                         string path = parameters.ToString();
                         var cv = _participantService.GetParticipantCV(path);
                         string cvMessage = cv != null ? "CV retrieved successfully" : "Failed to retrieve CV";
-                        return new PackageDTO { Result = cv != null, Message = cvMessage, Data = cv };
+                        return new PackageDTO.Builder()
+                            .SetResult(cv != null)
+                            .SetMessage(cvMessage)
+                            .SetData(cv)
+                            .Build();
                     case "SaveParticipantPhoto":
                         var photo = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, byte[]>>(parameters.ToString());
                         bool saved = _participantService.SaveParticipantPhoto(photo);
-                        return new PackageDTO { Result = saved, Message = saved ? "Photo saved successfully" : "Failed to save photo", Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(saved)
+                            .SetMessage(saved ? "Photo saved successfully" : "Failed to save photo")
+                            .Build();
                     case "SaveParticipantCV":
                         var cvData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, byte[]>>(parameters.ToString());
                         bool savedCV = _participantService.SaveParticipantCV(cvData);
-                        return new PackageDTO { Result = savedCV, Message = savedCV ? "CV saved successfully" : "Failed to save CV", Data = new { } };
+                        return new PackageDTO.Builder()
+                            .SetResult(savedCV)
+                            .SetMessage(savedCV ? "CV saved successfully" : "Failed to save CV")
+                            .Build();
                     case "CreateParticipantPresentation":
-                        //parameters ={"relation": {"Item1": 12,"Item2": 1}}
+                        //parameters ={"relation": {"
                         var participantPresentation = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Tuple<int, int>>>(parameters.ToString());
-                        bool createdParticipantPresentation = _participantService.CreateParticipantPresentation(participantPresentation["relation"].Item1, participantPresentation["relation"].Item2);                        
-                        return new PackageDTO { Result = createdParticipantPresentation, Message = createdParticipantPresentation ? "Participant presentation created successfully" : "Failed to create participant presentation" ,Data=new { } };
-
+                        bool createdParticipantPresentation = _participantService.CreateParticipantPresentation(participantPresentation["relation"].Item1, participantPresentation["relation"].Item2);
+                        return new PackageDTO.Builder()
+                            .SetResult(createdParticipantPresentation)
+                            .SetMessage(createdParticipantPresentation ? "Participant presentation created successfully" : "Failed to create participant presentation")
+                            .Build();
                     default:
-                        return new PackageDTO { Result = false, Message = "Method not found" };
+                        return new PackageDTO.Builder()
+                            .SetResult(false)
+                            .SetMessage("Method not found")
+                            .Build();
                 }
             }
             catch (Exception ex)
             {
-                return new PackageDTO { Result = false, Message = $"Error processing request: {ex.Message}" };
+                return new PackageDTO.Builder()
+                    .SetResult(false)
+                    .SetMessage($"Error processing request: {ex.Message}")
+                    .Build();
             }
         }
+
+
+
+
+
+
         private async Task<PackageDTO> HandleStatisticsServiceRequestAsync(string method, object parameters)
         {
             try
@@ -321,28 +453,51 @@ namespace Server.Services
                     case "GetNumberOfParticipantsByConference":
                         var participantsByConference = _statisticsService.GetNumberOfParticipantsByConference();
                         string participantsByConferenceMessage = participantsByConference != null ? "Participants retrieved successfully" : "Failed to retrieve participants";
-                        return new PackageDTO { Result = participantsByConference != null, Message = participantsByConferenceMessage, Data = participantsByConference };
+                        return new PackageDTO.Builder()
+                            .SetResult(participantsByConference != null)
+                            .SetMessage(participantsByConferenceMessage)
+                            .SetData(participantsByConference)
+                            .Build();
                     case "GetNumberOfParticipantsBySection":
                         var participantsBySection = _statisticsService.GetNumberOfParticipantsBySection();
                         string participantsBySectionMessage = participantsBySection != null ? "Participants retrieved successfully" : "Failed to retrieve participants";
-                        return new PackageDTO { Result = participantsBySection != null, Message = participantsBySectionMessage, Data = participantsBySection };
+                        return new PackageDTO.Builder()
+                            .SetResult(participantsBySection != null)
+                            .SetMessage(participantsBySectionMessage)
+                            .SetData(participantsBySection)
+                            .Build();
                     case "GetNumberOfPresentationsByAuthor":
                         var presentationsByAuthor = _statisticsService.GetNumberOfPresentationsByAuthor();
                         string presentationsByAuthorMessage = presentationsByAuthor != null ? "Presentations retrieved successfully" : "Failed to retrieve presentations";
-                        return new PackageDTO { Result = presentationsByAuthor != null, Message = presentationsByAuthorMessage, Data = presentationsByAuthor };
+                        return new PackageDTO.Builder()
+                            .SetResult(presentationsByAuthor != null)
+                            .SetMessage(presentationsByAuthorMessage)
+                            .SetData(presentationsByAuthor)
+                            .Build();
                     case "GetNumberOfPresentationsPerDay":
                         var presentationsPerDay = _statisticsService.GetNumberOfPresentationsPerDay();
                         string presentationsPerDayMessage = presentationsPerDay != null ? "Presentations retrieved successfully" : "Failed to retrieve presentations";
-                        return new PackageDTO { Result = presentationsPerDay != null, Message = presentationsPerDayMessage, Data = presentationsPerDay };
+                        return new PackageDTO.Builder()
+                            .SetResult(presentationsPerDay != null)
+                            .SetMessage(presentationsPerDayMessage)
+                            .SetData(presentationsPerDay)
+                            .Build();
 
                     default:
-                        return new PackageDTO { Result = false, Message = "Method not found" };
+                        return new PackageDTO.Builder()
+                            .SetResult(false)
+                            .SetMessage("Method not found")
+                            .Build();
                 }
             }
             catch (Exception ex)
             {
-                return new PackageDTO { Result = false, Message = $"Error processing request: {ex.Message}" };
+                return new PackageDTO.Builder()
+                    .SetResult(false)
+                    .SetMessage($"Error processing request: {ex.Message}")
+                    .Build();
             }
         }
+
     }
 }

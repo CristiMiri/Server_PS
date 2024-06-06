@@ -20,13 +20,13 @@ namespace Server.Repositories
         //Utility methods
         private static ConferenceDTO RowToConference(DataRow row)
         {
-            ConferenceDTO conference = new ConferenceDTO
-            {
-                Id = Convert.ToInt32(row["id"]),
-                Title = row["title"].ToString(),
-                Location = row["location"].ToString(),
-                Date = Convert.ToDateTime(row["date"])
-            };
+            ConferenceDTO conference = new ConferenceDTO.Builder()
+                .SetId(Convert.ToInt32(row["id"]))
+                .SetTitle(Convert.ToString(row["title"]))
+                .SetLocation(Convert.ToString(row["location"]))
+                .SetDate(Convert.ToDateTime(row["date"]))
+                .Build();
+            
             return conference;
         }
 

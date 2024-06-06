@@ -1,23 +1,19 @@
 ﻿using Server.Domain.Model;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server.Domain.DTO
 {
     internal class UserDTO
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public UserType UserType { get; set; }
-        public string Phone { get; set; }
+        public int Id { get; private set; }
+        public string Name { get; private set; }
+        public string Email { get; private set; }
+        public string Password { get; private set; }
+        public UserType UserType { get; private set; }
+        public string Phone { get; private set; }
 
-        // Default constructor
-        public UserDTO() { }
+        // Default constructor made private to enforce the use of the builder
+        private UserDTO() { }
 
         // Constructor to initialize the DTO from a User entity
         public UserDTO(User user)
@@ -44,6 +40,58 @@ namespace Server.Domain.DTO
                 userDTOs.Add(new UserDTO(user));
             }
             return userDTOs;
+        }
+
+        // Builder class
+        public class Builder
+        {
+            private readonly UserDTO _userDTO;
+
+            public Builder()
+            {
+                _userDTO = new UserDTO();
+            }
+
+            public Builder SetId(int id)
+            {
+                _userDTO.Id = id;
+                return this;
+            }
+
+            public Builder SetName(string name)
+            {
+                _userDTO.Name = name;
+                return this;
+            }
+
+            public Builder SetEmail(string email)
+            {
+                _userDTO.Email = email;
+                return this;
+            }
+
+            public Builder SetPassword(string password)
+            {
+                _userDTO.Password = password;
+                return this;
+            }
+
+            public Builder SetUserType(UserType userType)
+            {
+                _userDTO.UserType = userType;
+                return this;
+            }
+
+            public Builder SetPhone(string phone)
+            {
+                _userDTO.Phone = phone;
+                return this;
+            }
+
+            public UserDTO Build()
+            {
+                return _userDTO;
+            }
         }
     }
 }

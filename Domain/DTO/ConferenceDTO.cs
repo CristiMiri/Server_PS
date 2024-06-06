@@ -1,22 +1,18 @@
 ﻿using Server.Domain.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Server.Domain.DTO
 {
     internal class ConferenceDTO
     {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string Location { get; set; }
-        public DateTime Date { get; set; }
+        public int Id { get; private set; }
+        public string Title { get; private set; }
+        public string Location { get; private set; }
+        public DateTime Date { get; private set; }
 
-        // Default constructor
-        public ConferenceDTO() { }
+        // Default constructor made private to enforce the use of the builder
+        private ConferenceDTO() { }
 
         // Constructor to initialize the DTO from a Conference entity
         public ConferenceDTO(Conference conference)
@@ -41,6 +37,46 @@ namespace Server.Domain.DTO
                 conferenceDTOs.Add(new ConferenceDTO(conference));
             }
             return conferenceDTOs;
+        }
+
+        // Builder class
+        public class Builder
+        {
+            private readonly ConferenceDTO _conferenceDTO;
+
+            public Builder()
+            {
+                _conferenceDTO = new ConferenceDTO();
+            }
+
+            public Builder SetId(int id)
+            {
+                _conferenceDTO.Id = id;
+                return this;
+            }
+
+            public Builder SetTitle(string title)
+            {
+                _conferenceDTO.Title = title;
+                return this;
+            }
+
+            public Builder SetLocation(string location)
+            {
+                _conferenceDTO.Location = location;
+                return this;
+            }
+
+            public Builder SetDate(DateTime date)
+            {
+                _conferenceDTO.Date = date;
+                return this;
+            }
+
+            public ConferenceDTO Build()
+            {
+                return _conferenceDTO;
+            }
         }
     }
 }

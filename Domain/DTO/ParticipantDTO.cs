@@ -1,20 +1,20 @@
-﻿
-using Server.Domain.Model;
+﻿using Server.Domain.Model;
+using System.Collections.Generic;
 
 namespace Server.Domain.DTO
 {
     internal class ParticipantDTO
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
-        public string CNP { get; set; }
-        public string PdfFilePath { get; set; }
-        public string PhotoFilePath { get; set; }        
+        public int Id { get; private set; }
+        public string Name { get; private set; }
+        public string Email { get; private set; }
+        public string Phone { get; private set; }
+        public string CNP { get; private set; }
+        public string PdfFilePath { get; private set; }
+        public string PhotoFilePath { get; private set; }
 
-        // Default constructor
-        public ParticipantDTO() { }
+        // Default constructor made private to enforce the use of the builder
+        private ParticipantDTO() { }
 
         // Constructor to initialize the DTO from a Participant entity
         public ParticipantDTO(Participant participant)
@@ -42,6 +42,64 @@ namespace Server.Domain.DTO
                 participantDTOs.Add(new ParticipantDTO(participant));
             }
             return participantDTOs;
+        }
+
+        // Builder class
+        public class Builder
+        {
+            private readonly ParticipantDTO _participantDTO;
+
+            public Builder()
+            {
+                _participantDTO = new ParticipantDTO();
+            }
+
+            public Builder SetId(int id)
+            {
+                _participantDTO.Id = id;
+                return this;
+            }
+
+            public Builder SetName(string name)
+            {
+                _participantDTO.Name = name;
+                return this;
+            }
+
+            public Builder SetEmail(string email)
+            {
+                _participantDTO.Email = email;
+                return this;
+            }
+
+            public Builder SetPhone(string phone)
+            {
+                _participantDTO.Phone = phone;
+                return this;
+            }
+
+            public Builder SetCNP(string cnp)
+            {
+                _participantDTO.CNP = cnp;
+                return this;
+            }
+
+            public Builder SetPdfFilePath(string pdfFilePath)
+            {
+                _participantDTO.PdfFilePath = pdfFilePath;
+                return this;
+            }
+
+            public Builder SetPhotoFilePath(string photoFilePath)
+            {
+                _participantDTO.PhotoFilePath = photoFilePath;
+                return this;
+            }
+
+            public ParticipantDTO Build()
+            {
+                return _participantDTO;
+            }
         }
     }
 }

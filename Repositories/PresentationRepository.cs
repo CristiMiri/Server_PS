@@ -17,20 +17,20 @@ namespace Server.Repositories
         //Utility methods
         private PresentationDTO RowToPresentation(DataRow row)
         {
-            return new PresentationDTO
-            {
-                Id = Convert.ToInt32(row["id"]),
-                Title = row["title"].ToString(),
-                Description = row["description"].ToString(),
-                Date = Convert.ToDateTime(row["date"]),
-                Hour = TimeSpan.Parse(row["hour"].ToString()),
-                Section = (Section)Enum.Parse(typeof(Section), row["section"].ToString()),
-                IdConference = Convert.ToInt32(row["id_conference"]),
-                IdAuthor = Convert.ToInt32(row["id_author"]),
-                Author = new List<ParticipantDTO>(),
-                Participants = new List<ParticipantDTO>()
-            };
+            return new PresentationDTO.Builder()
+                .SetId(Convert.ToInt32(row["id"]))
+                .SetTitle(row["title"].ToString())
+                .SetDescription(row["description"].ToString())
+                .SetDate(Convert.ToDateTime(row["date"]))
+                .SetHour(TimeSpan.Parse(row["hour"].ToString()))
+                .SetSection((Section)Enum.Parse(typeof(Section), row["section"].ToString()))
+                .SetIdConference(Convert.ToInt32(row["id_conference"]))
+                .SetIdAuthor(Convert.ToInt32(row["id_author"]))
+                .SetParticipants(new List<ParticipantDTO>())  
+                .SetAuthor(new List<ParticipantDTO>())        
+                .Build();
         }
+
 
 
 

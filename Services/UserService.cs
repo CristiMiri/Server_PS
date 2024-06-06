@@ -2,11 +2,9 @@
 using Server.Domain.Model;
 using Server.Repositories;
 using Server.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
 
 namespace Server.Services
 {
@@ -14,7 +12,8 @@ namespace Server.Services
     {
         private UserRepository _userRepository;
         private EmailSender _emailSender;
-        public UserService() {
+        public UserService()
+        {
             _userRepository = new UserRepository();
             _emailSender = new EmailSender();
         }
@@ -41,7 +40,7 @@ namespace Server.Services
 
         public UserDTO GetUsersByEmailAndPassword(string email, string password)
         {
-            return _userRepository.ReadUserByEmailAndPassword(email,password);   
+            return _userRepository.ReadUserByEmailAndPassword(email, password);
         }
 
         public List<UserDTO> GetUsersByUserType(UserType userType)
@@ -74,18 +73,39 @@ namespace Server.Services
             return true;
         }
 
-        internal bool NotifyWhatsAppUpdate(UserDTO? userDTO)
+        internal async Task<bool> NotifyWhatsAppUpdate(UserDTO? userDTO)
         {
-            string accountSid = "YOUR_ACCOUNT_SID";
-            string authToken = "YOUR_AUTH_TOKEN";
-            TwilioClient.Init(accountSid, authToken);
-            var message = MessageResource.Create(
-            body: "This is a test message from Twilio",
-            from: new PhoneNumber("whatsapp:YOUR_TWILIO_WHATSAPP_NUMBER"),
-            to: new PhoneNumber("whatsapp:RECIPIENT_WHATSAPP_NUMBER")
-            );
+            string accountSid = "AC32e0e72e94485338299a13964d5a62be";
+            string authToken = "f5a9c4a00556b19f3b1703871a98897d";
+            string body = "Datele Voastre Personale au fost actualizate\n";
+            body += "email: " + userDTO.Email + "\n";
+            body += "name :" + userDTO.Name + "\n";
+            body += "password: " + userDTO.Password + "\n";
+            body += "phone: " + userDTO.Phone + "\n";
+            string from =   "whatsapp:+14155238886";
+            string to =     "whatsapp:+40" + userDTO.Phone;
+;
 
-            Console.WriteLine($"WhatsApp message sent: {message.Sid}");
+
+
+            TwilioClient.Init(accountSid, authToken);
+            var message = await MessageResource.CreateAsync(
+            body:   body,
+            from:   new PhoneNumber(from),
+            to:     new PhoneNumber(to)
+            );
+            if (message.Status == MessageResource.StatusEnum.Sent)
+            {
+                Console.WriteLine("Message sent successfully!");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine($"Message failed with error code: {message.ErrorCode}");
+                return false;
+            }            
         }
+
     }
+
 }

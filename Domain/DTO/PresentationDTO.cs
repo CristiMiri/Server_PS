@@ -1,27 +1,24 @@
 ﻿using Server.Domain.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server.Domain.DTO
 {
     internal class PresentationDTO
     {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public DateTime Date { get; set; }
-        public TimeSpan Hour { get; set; }
-        public Section Section { get; set; }
-        public int IdConference { get; set; }
-        public int IdAuthor { get; set; }
-        public List<ParticipantDTO> Participants { get; set; }
-        public List<ParticipantDTO> Author { get; set; }
+        public int Id { get; private set; }
+        public string Title { get; private set; }
+        public string Description { get; private set; }
+        public DateTime Date { get; private set; }
+        public TimeSpan Hour { get; private set; }
+        public Section Section { get; private set; }
+        public int IdConference { get; private set; }
+        public int IdAuthor { get; private set; }
+        public List<ParticipantDTO> Participants { get; private set; }
+        public List<ParticipantDTO> Author { get; private set; }
 
-        // Default constructor
-        public PresentationDTO() { }
+        // Default constructor made private to enforce the use of the builder
+        private PresentationDTO() { }
 
         // Constructor to initialize the DTO from a Presentation entity
         public PresentationDTO(Presentation presentation)
@@ -52,6 +49,82 @@ namespace Server.Domain.DTO
                 presentationDTOs.Add(new PresentationDTO(presentation));
             }
             return presentationDTOs;
+        }
+
+        // Builder class
+        public class Builder
+        {
+            private readonly PresentationDTO _presentationDTO;
+
+            public Builder()
+            {
+                _presentationDTO = new PresentationDTO();
+            }
+
+            public Builder SetId(int id)
+            {
+                _presentationDTO.Id = id;
+                return this;
+            }
+
+            public Builder SetTitle(string title)
+            {
+                _presentationDTO.Title = title;
+                return this;
+            }
+
+            public Builder SetDescription(string description)
+            {
+                _presentationDTO.Description = description;
+                return this;
+            }
+
+            public Builder SetDate(DateTime date)
+            {
+                _presentationDTO.Date = date;
+                return this;
+            }
+
+            public Builder SetHour(TimeSpan hour)
+            {
+                _presentationDTO.Hour = hour;
+                return this;
+            }
+
+            public Builder SetSection(Section section)
+            {
+                _presentationDTO.Section = section;
+                return this;
+            }
+
+            public Builder SetIdConference(int idConference)
+            {
+                _presentationDTO.IdConference = idConference;
+                return this;
+            }
+
+            public Builder SetIdAuthor(int idAuthor)
+            {
+                _presentationDTO.IdAuthor = idAuthor;
+                return this;
+            }
+
+            public Builder SetParticipants(List<ParticipantDTO> participants)
+            {
+                _presentationDTO.Participants = participants;
+                return this;
+            }
+
+            public Builder SetAuthor(List<ParticipantDTO> author)
+            {
+                _presentationDTO.Author = author;
+                return this;
+            }
+
+            public PresentationDTO Build()
+            {
+                return _presentationDTO;
+            }
         }
     }
 }

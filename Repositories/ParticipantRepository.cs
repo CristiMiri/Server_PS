@@ -28,17 +28,17 @@ namespace Server.Repositories
         //Utility methods
         private static ParticipantDTO RowToParticipant(DataRow row)
         {
-            return new ParticipantDTO
-            {
-                Id = Convert.ToInt32(row["id"]),
-                Name = row["name"].ToString(),
-                Email = row["email"].ToString(),
-                Phone = row["phone"].ToString(),
-                CNP = row["cnp"].ToString(),
-                PdfFilePath = row["pdf_file_path"].ToString(),
-                PhotoFilePath = row["photo_file_path"].ToString(),
-            };
+            return new ParticipantDTO.Builder()
+                .SetId(Convert.ToInt32(row["id"]))
+                .SetName(row["name"].ToString())
+                .SetEmail(row["email"].ToString())
+                .SetPhone(row["phone"].ToString())
+                .SetCNP(row["cnp"].ToString())
+                .SetPdfFilePath(row["pdf_file_path"].ToString())
+                .SetPhotoFilePath(row["photo_file_path"].ToString())
+                .Build();
         }
+
 
 
         //CRUD methods

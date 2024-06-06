@@ -21,15 +21,16 @@ namespace Server.Repositories
         //Utility methods
         private static UserDTO RowToUser(DataRow row)
         {
-            UserDTO user = new UserDTO();
-            user.Id = Convert.ToInt32(row["id"]);
-            user.Name = row["name"].ToString();
-            user.Email = row["email"].ToString();
-            user.Password = row["password"].ToString();
-            user.UserType = (UserType)Enum.Parse(typeof(UserType), row["user_type"].ToString(), true);
-            user.Phone = row["phone"].ToString();
-            return user;
+            return new UserDTO.Builder()
+                .SetId(Convert.ToInt32(row["id"]))
+                .SetName(row["name"].ToString())
+                .SetEmail(row["email"].ToString())
+                .SetPassword(row["password"].ToString())
+                .SetUserType((UserType)Enum.Parse(typeof(UserType), row["user_type"].ToString(), true))
+                .SetPhone(row["phone"].ToString())
+                .Build();
         }
+
 
 
         //CRUD methods
